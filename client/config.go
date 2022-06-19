@@ -16,9 +16,9 @@ type ClientConfigOption struct {
 	UaIpAddr    *sip.Address //sip:%s@%s:%d sip:31011500991320000343@192.168.3.105:5060
 	NewUaIpAddr *sip.Address //sip:%s@%s:%d sip:31011500991320000343@received:rport //返回的via
 
-	ServerIp        *sip.Address //dst ip port   FHost: "218.107.213.5", FPort: 5060
+	ServerIp        *sip.Address //dst ip port   FHost: "192.168.3.100", FPort: 5060
 	ServerRealmAddr *sip.Address //sip:%s@%s sip:44010200492000000001@4401020049
-	ServeIpAddr     *sip.Address //sip:%s@%s sip:44010200492000000001@218.107.213.5:5060
+	ServeIpAddr     *sip.Address //sip:%s@%s sip:44010200492000000001@192.168.3.100:5060
 
 	m     *sync.Mutex //统计计数的锁
 	seqNo uint32      //累计计数
