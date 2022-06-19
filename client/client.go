@@ -23,6 +23,7 @@ import (
 type RequestHandler func(clientConfig *ClientConfigOption, req sip.Request, tx sip.ServerTransaction)
 
 type Server interface {
+	Start() error
 	Shutdown()
 
 	Listen(network, addr string, options ...transport.ListenOption) error
@@ -43,6 +44,8 @@ type Server interface {
 		reason, body string,
 		headers []sip.Header,
 	) (sip.ServerTransaction, error)
+
+	Register() (sip.Response, error)
 }
 
 type TransportLayerFactory func(
@@ -63,6 +66,8 @@ type ServerConfig struct {
 	Extensions []string
 	MsgMapper  sip.MessageMapper
 	UserAgent  string
+
+	ClientConfig ClientConfigOption
 }
 
 // Server is a SIP server
@@ -98,6 +103,19 @@ func NewServer(
 	}
 
 	logger = logger.WithPrefix("gosip.Server")
+
+	if config.Host == "" {
+		config.Host = config.ClientConfig.GB28181.LocalHost
+	}
+	if config.ClientConfig.m == nil {
+		config.ClientConfig.m = new(sync.Mutex)
+	}
+	if config.ClientConfig.msn == nil {
+		config.ClientConfig.msn = new(sync.Mutex)
+	}
+	//初始配置初始化
+	config.ClientConfig.GetUaOption()
+	config.ClientConfig.GetServerOption()
 
 	var host string
 	var ip net.IP
@@ -148,6 +166,7 @@ func NewServer(
 		requestHandlers: make(map[sip.RequestMethod]RequestHandler),
 		extensions:      extensions,
 		userAgent:       userAgent,
+		ClientConfig:    config.ClientConfig,
 	}
 	srv.log = logger.WithFields(log.Fields{
 		"sip_server_ptr": fmt.Sprintf("%p", srv),
