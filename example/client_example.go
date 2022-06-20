@@ -162,5 +162,6 @@ func main() {
 	if res != nil {
 		fmt.Println("res : ", res.String())
 	}
+
 	select {}
 }

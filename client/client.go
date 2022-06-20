@@ -46,6 +46,10 @@ type Server interface {
 	) (sip.ServerTransaction, error)
 
 	Register() (sip.Response, error)
+	SendMessageNoWithParas(body string) (sip.Response, error)
+
+	Keepalive(deviceID, status string) (sip.Response, error)
+	MobileInfo(deviceID, longitude, latitude string) (sip.Response, error)
 }
 
 type TransportLayerFactory func(
@@ -106,6 +110,9 @@ func NewServer(
 
 	if config.Host == "" {
 		config.Host = config.ClientConfig.GB28181.LocalHost
+	}
+	if config.ClientConfig.crwm == nil {
+		config.ClientConfig.crwm = new(sync.RWMutex)
 	}
 	if config.ClientConfig.m == nil {
 		config.ClientConfig.m = new(sync.Mutex)

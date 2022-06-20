@@ -12,6 +12,8 @@ import (
 type ClientConfigOption struct {
 	GB28181 device.GB28181Config
 
+	crwm *sync.RWMutex
+
 	UaRealmAddr *sip.Address //sip:%s@%s sip:31011500991320000343@4401020049 携带tag Params: sip.NewParams().Add("tag", sip.String{Str: utils.RandNumString(9)})
 	UaIpAddr    *sip.Address //sip:%s@%s:%d sip:31011500991320000343@192.168.3.105:5060
 	NewUaIpAddr *sip.Address //sip:%s@%s:%d sip:31011500991320000343@received:rport //返回的via
@@ -25,6 +27,8 @@ type ClientConfigOption struct {
 
 	msn *sync.Mutex //sn计数的锁
 	sn  int         //sn计数
+
+	Source, Destination, Transport string
 }
 
 func (c *ClientConfigOption) GetUaOption() error {
