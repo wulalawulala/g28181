@@ -98,6 +98,15 @@ func OnInvite(s *client.ServerOpt, req sip.Request, tx sip.ServerTransaction) {
 	fmt.Printf("OnInvite : %s\n", req.String())
 	tx.Respond(sip.NewResponseFromRequest(req.MessageID(), req, http.StatusContinue, "Trying", ""))
 
+	from, ok := req.From()
+	if !ok {
+		return
+	}
+	serverID := from.Address.User().String()
+	if serverID != s.ClientConfig.GB28181.ServerID {
+		return
+	}
+
 	var ssdp string
 	//解析sdp
 	body := req.Body()
@@ -116,6 +125,15 @@ func OnInvite(s *client.ServerOpt, req sip.Request, tx sip.ServerTransaction) {
 func OnBye(s *client.ServerOpt, req sip.Request, tx sip.ServerTransaction) {
 	fmt.Printf("OnBye : %s\n", req.String())
 	tx.Respond(sip.NewResponseFromRequest(req.MessageID(), req, http.StatusOK, http.StatusText(http.StatusOK), ""))
+
+	from, ok := req.From()
+	if !ok {
+		return
+	}
+	serverID := from.Address.User().String()
+	if serverID != s.ClientConfig.GB28181.ServerID {
+		return
+	}
 	//关闭流传输,自定义操作
 
 }
