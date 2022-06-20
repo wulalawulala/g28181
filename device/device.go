@@ -32,5 +32,7 @@ type GB28181Config struct {
 	LocalSipPort      int          `json:"localSipPort"`      //本地的端口
 	GBID              string       `json:"gbID"`              //设备国标ID
 	Version           string       `json:"Version"`
-	Devices           []DeviceInfo `json:"devices"` //从设备地址
+	Manufacturer      string       `json:"Manufacturer"` //设备厂商
+	Model             string       `json:"Model"`        //设备model
+	Devices           []DeviceInfo `json:"devices"`      //从设备地址
 }

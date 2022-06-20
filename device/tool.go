@@ -1,8 +1,12 @@
 package device
 
 import (
+	"bytes"
+	"encoding/xml"
 	"math/rand"
 	"time"
+
+	"golang.org/x/net/html/charset"
 )
 
 // https://github.com/kpbird/golang_random_string
@@ -30,4 +34,16 @@ func randStringBySoure(src string, n int) string {
 func RandNumString(n int) string {
 	numbers := "0123456789"
 	return randStringBySoure(numbers, n)
+}
+
+// XMLDecode XMLDecode
+func XMLDecode(data []byte, v interface{}) error {
+	decoder := xml.NewDecoder(bytes.NewReader([]byte(data)))
+	decoder.CharsetReader = charset.NewReaderLabel
+	return decoder.Decode(v)
+}
+
+// XMLEncode XMLEncode
+func XMLEncode(v interface{}) ([]byte, error) {
+	return xml.MarshalIndent(v, "", "  ")
 }
