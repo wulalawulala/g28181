@@ -9,9 +9,7 @@ import (
 	"github.com/ghettovoice/gosip/sip"
 )
 
-const DefaultsipVersion = "SIP/2.0"
-
-func (srv *server) Register() (sip.Response, error) {
+func (srv *ServerOpt) Register() (sip.Response, error) {
 	if !srv.running.IsSet() {
 		return nil, errors.New("please Start srv")
 	}
@@ -53,5 +51,15 @@ func (srv *server) Register() (sip.Response, error) {
 	}
 	rsp, err := srv.RequestWithContext(ctx, req, WithAuthorizer(authorizer))
 
+	if rsp != nil {
+		//设置nat的方法
+		if via, ok := rsp.ViaHop(); ok {
+			rport, ok1 := via.Params.Get("rport")
+			received, ok2 := via.Params.Get("received")
+			if ok1 && ok2 {
+				srv.ClientConfig.GetNewUaIpAddr(received.String(), rport.String())
+			}
+		}
+	}
 	return rsp, err
 }

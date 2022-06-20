@@ -45,6 +45,7 @@ func (c *ClientConfigOption) GetUaOption() error {
 		Uri: uaIpUrl,
 	}
 
+	c.NewUaIpAddr = c.UaIpAddr
 	return nil
 }
 

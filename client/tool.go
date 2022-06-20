@@ -2,7 +2,7 @@ package client
 
 import "github.com/ghettovoice/gosip/sip"
 
-func (srv *server) GetNewVia() sip.ViaHeader {
+func (srv *ServerOpt) GetNewVia() sip.ViaHeader {
 	port := sip.Port(srv.ClientConfig.GB28181.LocalSipPort)
 	via := sip.ViaHeader{
 		&sip.ViaHop{
@@ -17,7 +17,7 @@ func (srv *server) GetNewVia() sip.ViaHeader {
 	return via
 }
 
-func (srv *server) GetSeq(method sip.RequestMethod) sip.CSeq {
+func (srv *ServerOpt) GetSeq(method sip.RequestMethod) sip.CSeq {
 	srv.ClientConfig.m.Lock()
 	srv.ClientConfig.seqNo++
 	cseq := sip.CSeq{
@@ -28,7 +28,7 @@ func (srv *server) GetSeq(method sip.RequestMethod) sip.CSeq {
 	return cseq
 }
 
-func (srv *server) GetSn() int {
+func (srv *ServerOpt) GetSn() int {
 	srv.ClientConfig.msn.Lock()
 	defer srv.ClientConfig.msn.Unlock()
 	srv.ClientConfig.sn++

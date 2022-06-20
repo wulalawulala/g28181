@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"g28181/client"
 	"g28181/device"
+	"net/http"
 	"time"
 
 	"github.com/ghettovoice/gosip/log"
@@ -49,11 +50,22 @@ func Read(g *device.GB28181Config) {
 	g.Devices[0].Status = "ON"
 
 }
-func OnMessage(c *client.ClientConfigOption, req sip.Request, tx sip.ServerTransaction) {
-	fmt.Println("GBID : ", c.GB28181.GBID)
+func OnMessage(s *client.ServerOpt, req sip.Request, tx sip.ServerTransaction) {
+	// fmt.Println("GBID : ", s)
 	fmt.Printf("OnMessage : %s\n", req.String())
+	//应答ok必不可少
+	tx.Respond(sip.NewResponseFromRequest(req.MessageID(), req, http.StatusOK, http.StatusText(http.StatusOK), ""))
 
+	//应答
+	var source, destination, transport string
+	source = req.Source()
+	destination = req.Destination()
+	transport = req.Transport()
+	go func() {
+		s.SendMessage(source, destination, transport, "")
+	}()
 }
+
 func main() {
 	logger := log.NewDefaultLogrusLogger()
 	var gb28181Config device.GB28181Config

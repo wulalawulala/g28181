@@ -20,7 +20,7 @@ import (
 // RequestHandler is a callback that will be called on the incoming request
 // of the certain method
 // tx argument can be nil for 2xx ACK request
-type RequestHandler func(clientConfig *ClientConfigOption, req sip.Request, tx sip.ServerTransaction)
+type RequestHandler func(srv *ServerOpt, req sip.Request, tx sip.ServerTransaction)
 
 type Server interface {
 	Start() error
@@ -61,7 +61,7 @@ type TransactionLayerFactory func(tpl sip.Transport, logger log.Logger) transact
 type ServerConfig struct {
 	// Public IP address or domain name, if empty auto resolved IP will be used.
 	Host string
-	// Dns is an address of the public DNS server to use in SRV lookup.
+	// Dns is an address of the public DNS ServerOpt to use in SRV lookup.
 	Dns        string
 	Extensions []string
 	MsgMapper  sip.MessageMapper
@@ -70,8 +70,8 @@ type ServerConfig struct {
 	ClientConfig ClientConfigOption
 }
 
-// Server is a SIP server
-type server struct {
+// Server is a SIP ServerOpt
+type ServerOpt struct {
 	running         abool.AtomicBool
 	tp              transport.Layer
 	tx              transaction.Layer
@@ -88,7 +88,7 @@ type server struct {
 	log log.Logger
 }
 
-// NewServer creates new instance of SIP server.
+// NewServer creates new instance of SIP ServerOpt.
 func NewServer(
 	config ServerConfig,
 	tpFactory TransportLayerFactory,
@@ -158,7 +158,7 @@ func NewServer(
 		userAgent = "GoSIP"
 	}
 
-	srv := &server{
+	srv := &ServerOpt{
 		host:            host,
 		ip:              ip,
 		hwg:             new(sync.WaitGroup),
@@ -169,7 +169,7 @@ func NewServer(
 		ClientConfig:    config.ClientConfig,
 	}
 	srv.log = logger.WithFields(log.Fields{
-		"sip_server_ptr": fmt.Sprintf("%p", srv),
+		"sip_ServerOpt_ptr": fmt.Sprintf("%p", srv),
 	})
 	srv.tp = tpFactory(ip, dnsResolver, config.MsgMapper, srv.Log())
 	sipTp := &sipTransport{
@@ -184,16 +184,16 @@ func NewServer(
 	return srv
 }
 
-func (srv *server) Log() log.Logger {
+func (srv *ServerOpt) Log() log.Logger {
 	return srv.log
 }
 
 // ListenAndServe starts serving listeners on the provided address
-func (srv *server) Listen(network string, listenAddr string, options ...transport.ListenOption) error {
+func (srv *ServerOpt) Listen(network string, listenAddr string, options ...transport.ListenOption) error {
 	return srv.tp.Listen(network, listenAddr, options...)
 }
 
-func (srv *server) serve() {
+func (srv *ServerOpt) serve() {
 	defer srv.Shutdown()
 
 	for {
@@ -246,7 +246,7 @@ func (srv *server) serve() {
 	}
 }
 
-func (srv *server) handleRequest(req sip.Request, tx sip.ServerTransaction) {
+func (srv *ServerOpt) handleRequest(req sip.Request, tx sip.ServerTransaction) {
 	defer srv.hwg.Done()
 
 	logger := srv.Log().WithFields(req.Fields())
@@ -271,7 +271,7 @@ func (srv *server) handleRequest(req sip.Request, tx sip.ServerTransaction) {
 							return
 						}
 
-						logger.Warnf("error from SIP server transaction %s: %s", tx, err)
+						logger.Warnf("error from SIP ServerOpt transaction %s: %s", tx, err)
 					}
 				}
 			}(tx, logger)
@@ -288,19 +288,19 @@ func (srv *server) handleRequest(req sip.Request, tx sip.ServerTransaction) {
 		return
 	}
 
-	go handler(&srv.ClientConfig, req, tx)
+	go handler(srv, req, tx)
 }
 
 // Send SIP message
-func (srv *server) Request(req sip.Request) (sip.ClientTransaction, error) {
+func (srv *ServerOpt) Request(req sip.Request) (sip.ClientTransaction, error) {
 	if !srv.running.IsSet() {
-		return nil, fmt.Errorf("can not send through stopped server")
+		return nil, fmt.Errorf("can not send through stopped ServerOpt")
 	}
 
 	return srv.tx.Request(srv.prepareRequest(req))
 }
 
-func (srv *server) RequestWithContext(
+func (srv *ServerOpt) RequestWithContext(
 	ctx context.Context,
 	request sip.Request,
 	options ...RequestWithContextOption,
@@ -308,7 +308,7 @@ func (srv *server) RequestWithContext(
 	return srv.requestWithContext(ctx, request, 1, options...)
 }
 
-func (srv *server) requestWithContext(
+func (srv *ServerOpt) requestWithContext(
 	ctx context.Context,
 	request sip.Request,
 	attempt int,
@@ -448,21 +448,21 @@ func (srv *server) requestWithContext(
 	return res, err
 }
 
-func (srv *server) prepareRequest(req sip.Request) sip.Request {
+func (srv *ServerOpt) prepareRequest(req sip.Request) sip.Request {
 	srv.appendAutoHeaders(req)
 
 	return req
 }
 
-func (srv *server) Respond(res sip.Response) (sip.ServerTransaction, error) {
+func (srv *ServerOpt) Respond(res sip.Response) (sip.ServerTransaction, error) {
 	if !srv.running.IsSet() {
-		return nil, fmt.Errorf("can not send through stopped server")
+		return nil, fmt.Errorf("can not send through stopped ServerOpt")
 	}
 
 	return srv.tx.Respond(srv.prepareResponse(res))
 }
 
-func (srv *server) RespondOnRequest(
+func (srv *ServerOpt) RespondOnRequest(
 	request sip.Request,
 	status sip.StatusCode,
 	reason, body string,
@@ -481,9 +481,9 @@ func (srv *server) RespondOnRequest(
 	return tx, nil
 }
 
-func (srv *server) Send(msg sip.Message) error {
+func (srv *ServerOpt) Send(msg sip.Message) error {
 	if !srv.running.IsSet() {
-		return fmt.Errorf("can not send through stopped server")
+		return fmt.Errorf("can not send through stopped ServerOpt")
 	}
 
 	switch m := msg.(type) {
@@ -496,14 +496,14 @@ func (srv *server) Send(msg sip.Message) error {
 	return srv.tp.Send(msg)
 }
 
-func (srv *server) prepareResponse(res sip.Response) sip.Response {
+func (srv *ServerOpt) prepareResponse(res sip.Response) sip.Response {
 	srv.appendAutoHeaders(res)
 
 	return res
 }
 
-// Shutdown gracefully shutdowns SIP server
-func (srv *server) Shutdown() {
+// Shutdown gracefully shutdowns SIP ServerOpt
+func (srv *ServerOpt) Shutdown() {
 	if !srv.running.IsSet() {
 		return
 	}
@@ -519,7 +519,7 @@ func (srv *server) Shutdown() {
 }
 
 // OnRequest registers new request callback
-func (srv *server) OnRequest(method sip.RequestMethod, handler RequestHandler) error {
+func (srv *ServerOpt) OnRequest(method sip.RequestMethod, handler RequestHandler) error {
 	srv.hmu.Lock()
 	srv.requestHandlers[method] = handler
 	srv.hmu.Unlock()
@@ -527,7 +527,7 @@ func (srv *server) OnRequest(method sip.RequestMethod, handler RequestHandler) e
 	return nil
 }
 
-func (srv *server) appendAutoHeaders(msg sip.Message) {
+func (srv *ServerOpt) appendAutoHeaders(msg sip.Message) {
 	autoAppendMethods := map[sip.RequestMethod]bool{
 		sip.INVITE:   true,
 		sip.REGISTER: true,
@@ -578,7 +578,7 @@ func (srv *server) appendAutoHeaders(msg sip.Message) {
 	}
 }
 
-func (srv *server) getAllowedMethods() []sip.RequestMethod {
+func (srv *ServerOpt) getAllowedMethods() []sip.RequestMethod {
 	methods := []sip.RequestMethod{
 		sip.INVITE,
 		sip.ACK,
@@ -603,7 +603,7 @@ func (srv *server) getAllowedMethods() []sip.RequestMethod {
 
 type sipTransport struct {
 	tpl transport.Layer
-	srv *server
+	srv *ServerOpt
 }
 
 func (tp *sipTransport) Messages() <-chan sip.Message {
