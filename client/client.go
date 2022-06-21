@@ -50,6 +50,7 @@ type Server interface {
 
 	Keepalive(deviceID, status string) (sip.Response, error)
 	MobileInfo(deviceID, longitude, latitude string) (sip.Response, error)
+	GetConfig() *ClientConfigOption
 }
 
 type TransportLayerFactory func(

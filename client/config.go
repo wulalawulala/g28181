@@ -94,3 +94,7 @@ func (c *ClientConfigOption) GetServerOption() error {
 
 	return nil
 }
+
+func (s *ServerOpt) GetConfig() *ClientConfigOption {
+	return &s.ClientConfig
+}
