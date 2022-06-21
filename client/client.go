@@ -97,7 +97,6 @@ func NewServer(
 	config ServerConfig,
 	tpFactory TransportLayerFactory,
 	txFactory TransactionLayerFactory,
-	logger log.Logger,
 ) Server {
 	if tpFactory == nil {
 		tpFactory = transport.NewLayer
@@ -105,8 +104,9 @@ func NewServer(
 	if txFactory == nil {
 		txFactory = transaction.NewLayer
 	}
-
-	logger = logger.WithPrefix("gosip.Server")
+	// if config.ClientConfig.L == nil {
+	config.ClientConfig.L = log.NewDefaultLogrusLogger().WithPrefix("gosip.Server")
+	// }
 
 	if config.Host == "" {
 		config.Host = config.ClientConfig.GB28181.LocalHost
@@ -131,14 +131,14 @@ func NewServer(
 		if addr, err := net.ResolveIPAddr("ip", host); err == nil {
 			ip = addr.IP
 		} else {
-			logger.Panicf("resolve host IP failed: %s", err)
+			config.ClientConfig.L.Panicf("resolve host IP failed: %s", err)
 		}
 	} else {
 		if v, err := util.ResolveSelfIP(); err == nil {
 			ip = v
 			host = v.String()
 		} else {
-			logger.Panicf("resolve host IP failed: %s", err)
+			config.ClientConfig.L.Panicf("resolve host IP failed: %s", err)
 		}
 	}
 
@@ -175,7 +175,7 @@ func NewServer(
 		userAgent:       userAgent,
 		ClientConfig:    config.ClientConfig,
 	}
-	srv.log = logger.WithFields(log.Fields{
+	srv.log = config.ClientConfig.L.WithFields(log.Fields{
 		"sip_ServerOpt_ptr": fmt.Sprintf("%p", srv),
 	})
 	srv.tp = tpFactory(ip, dnsResolver, config.MsgMapper, srv.Log())

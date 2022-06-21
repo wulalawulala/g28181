@@ -9,7 +9,6 @@ import (
 	"github.com/wulalawulala/g28181/device"
 	"github.com/wulalawulala/g28181/sdp"
 
-	"github.com/ghettovoice/gosip/log"
 	"github.com/ghettovoice/gosip/sip"
 )
 
@@ -17,7 +16,6 @@ func Read(g *device.GB28181Config) {
 
 	g.ServerID = "44010200492000000001"
 	g.Realm = "4401020049"
-	g.ServerIp = "192.168.1.110"
 
 	// g.ServerPort = 5060
 	g.ServerPort = 5060
@@ -141,7 +139,7 @@ func OnBye(s *client.ServerOpt, req sip.Request, tx sip.ServerTransaction) {
 }
 
 func main() {
-	logger := log.NewDefaultLogrusLogger()
+
 	var gb28181Config device.GB28181Config
 	Read(&gb28181Config)
 	srvconf := client.ServerConfig{
@@ -150,7 +148,7 @@ func main() {
 		},
 	}
 
-	srv := client.NewServer(srvconf, nil, nil, logger)
+	srv := client.NewServer(srvconf, nil, nil)
 	if srv == nil {
 		return
 	}

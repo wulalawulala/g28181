@@ -6,11 +6,13 @@ import (
 
 	"github.com/wulalawulala/g28181/device"
 
+	"github.com/ghettovoice/gosip/log"
 	"github.com/ghettovoice/gosip/sip"
 	"github.com/ghettovoice/gosip/sip/parser"
 )
 
 type ClientConfigOption struct {
+	L       log.Logger
 	GB28181 device.GB28181Config
 
 	crwm *sync.RWMutex //访问GB28181的DeviceInfo需要开锁和解锁
