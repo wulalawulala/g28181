@@ -12,7 +12,7 @@ import (
 type ClientConfigOption struct {
 	GB28181 device.GB28181Config
 
-	crwm *sync.RWMutex
+	crwm *sync.RWMutex //访问GB28181的DeviceInfo需要开锁和解锁
 
 	UaRealmAddr *sip.Address //sip:%s@%s sip:31011500991320000343@4401020049 携带tag Params: sip.NewParams().Add("tag", sip.String{Str: utils.RandNumString(9)})
 	UaIpAddr    *sip.Address //sip:%s@%s:%d sip:31011500991320000343@192.168.3.105:5060
@@ -28,6 +28,7 @@ type ClientConfigOption struct {
 	msn *sync.Mutex //sn计数的锁
 	sn  int         //sn计数
 
+	rport, received                string
 	Source, Destination, Transport string
 }
 

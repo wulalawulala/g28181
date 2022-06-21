@@ -17,6 +17,7 @@ func Read(g *device.GB28181Config) {
 	g.ServerID = "44010200492000000001"
 	g.Realm = "4401020049"
 	g.ServerIp = "192.168.1.110"
+
 	// g.ServerPort = 5060
 	g.ServerPort = 5060
 	g.UserName = "WVP_PWD"
@@ -161,6 +162,14 @@ func main() {
 	fmt.Println("Register err : ", err)
 	if res != nil {
 		fmt.Println("res : ", res.String())
+	}
+	for {
+		time.Sleep(time.Second * 30)
+		res, err = srv.Keepalive("", "")
+		fmt.Println("Keepalive err : ", err)
+		if res != nil {
+			fmt.Println("res : ", res.String())
+		}
 	}
 
 	select {}
