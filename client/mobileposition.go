@@ -1,7 +1,7 @@
 package client
 
 import (
-	"g28181/device"
+	"github.com/wulalawulala/g28181/device"
 
 	"github.com/ghettovoice/gosip/sip"
 )

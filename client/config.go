@@ -2,8 +2,9 @@ package client
 
 import (
 	"fmt"
-	"g28181/device"
 	"sync"
+
+	"github.com/wulalawulala/g28181/device"
 
 	"github.com/ghettovoice/gosip/sip"
 	"github.com/ghettovoice/gosip/sip/parser"

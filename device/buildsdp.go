@@ -3,7 +3,7 @@ package device
 import (
 	"time"
 
-	"g28181/sdp"
+	"github.com/wulalawulala/g28181/sdp"
 )
 
 //port填0,填其他数值发送不到服务器(目前无法解决)

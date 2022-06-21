@@ -1,4 +1,4 @@
-module g28181
+module github.com/wulalawulala/g28181
 
 go 1.18
 
