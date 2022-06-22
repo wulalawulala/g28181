@@ -17,6 +17,7 @@ func Read(g *device.GB28181Config) {
 	g.ServerID = "44010200492000000001"
 	g.Realm = "4401020049"
 
+	g.ServerIp = "117.30.230.20"
 	// g.ServerPort = 5060
 	g.ServerPort = 5060
 	g.UserName = "WVP_PWD"

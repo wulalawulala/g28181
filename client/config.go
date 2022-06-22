@@ -98,3 +98,7 @@ func (c *ClientConfigOption) GetServerOption() error {
 func (s *ServerOpt) GetConfig() *ClientConfigOption {
 	return &s.ClientConfig
 }
+
+func (s *ServerOpt) GetServerOpt() *ServerOpt {
+	return s
+}
