@@ -35,13 +35,13 @@ func (srv *ServerOpt) Keepalive(deviceID, status string) (sip.Response, error) {
 	return res, err
 }
 
-func (srv *ServerOpt) MobileInfo(deviceID, longitude, latitude string) (sip.Response, error) {
+func (srv *ServerOpt) MobileInfo(deviceID, longitude, latitude, speed string) (sip.Response, error) {
 
 	if deviceID == "" {
 		deviceID = srv.ClientConfig.GB28181.GBID
 	}
 
-	mobilePositionInfoStr := device.MobilePositionInfoBuild(srv.GetSn(), deviceID, longitude, latitude)
+	mobilePositionInfoStr := device.MobilePositionInfoBuild(srv.GetSn(), deviceID, longitude, latitude, speed)
 
 	return srv.SendMessageNoWithParas(mobilePositionInfoStr)
 }

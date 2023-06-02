@@ -49,7 +49,7 @@ type Server interface {
 	SendMessageNoWithParas(body string) (sip.Response, error)
 
 	Keepalive(deviceID, status string) (sip.Response, error)
-	MobileInfo(deviceID, longitude, latitude string) (sip.Response, error)
+	MobileInfo(deviceID, longitude, latitude, speed string) (sip.Response, error)
 	GetConfig() *ClientConfigOption
 	GetServerOpt() *ServerOpt
 }

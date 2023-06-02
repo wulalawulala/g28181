@@ -52,7 +52,7 @@ func KeepaliveInfoBuild(sn int, deviceID, status string) string {
 	return string(bodyByte)
 }
 
-func MobilePositionInfoBuild(sn int, deviceID, longitude, latitude string) string {
+func MobilePositionInfoBuild(sn int, deviceID, longitude, latitude, speed string) string {
 	var mobilePositionInfo MobilePositionInfo
 	mobilePositionInfo.CmdType = "MobilePosition"
 	mobilePositionInfo.SN = sn
@@ -60,6 +60,7 @@ func MobilePositionInfoBuild(sn int, deviceID, longitude, latitude string) strin
 	mobilePositionInfo.Time = time.Now().Format("2006-01-02T15:04:05")
 	mobilePositionInfo.Longitude = longitude
 	mobilePositionInfo.Latitude = latitude
+	mobilePositionInfo.Speed = speed
 
 	bodyByte, err := XMLEncode(mobilePositionInfo)
 	if err != nil {
