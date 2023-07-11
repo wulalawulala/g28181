@@ -21,7 +21,8 @@ func (srv *ServerOpt) SendMessage(source, destination, transport string, body st
 		DefaultsipVersion,
 		[]sip.Header{
 			srv.GetNewVia(),
-			srv.ClientConfig.UaIpAddr.AsFromHeader(),
+			// srv.ClientConfig.UaIpAddr.AsFromHeader(),
+			srv.ClientConfig.UaRealmAddr.AsFromHeader(),
 			srv.ClientConfig.ServeIpAddr.AsToHeader(),
 			srv.ClientConfig.NewUaIpAddr.AsContactHeader(),
 			&callId,
@@ -57,7 +58,8 @@ func (srv *ServerOpt) SendMessageNoWithParas(body string) (sip.Response, error) 
 		DefaultsipVersion,
 		[]sip.Header{
 			srv.GetNewVia(),
-			srv.ClientConfig.UaIpAddr.AsFromHeader(),
+			// srv.ClientConfig.UaIpAddr.AsFromHeader(),
+			srv.ClientConfig.UaRealmAddr.AsFromHeader(),
 			srv.ClientConfig.ServeIpAddr.AsToHeader(),
 			srv.ClientConfig.NewUaIpAddr.AsContactHeader(),
 			&callId,

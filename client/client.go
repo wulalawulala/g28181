@@ -13,6 +13,7 @@ import (
 	"github.com/ghettovoice/gosip/transaction"
 	"github.com/ghettovoice/gosip/transport"
 	"github.com/ghettovoice/gosip/util"
+	"github.com/wulalawulala/g28181/device"
 
 	"github.com/tevino/abool"
 )
@@ -123,6 +124,8 @@ func NewServer(
 		config.ClientConfig.msn = new(sync.Mutex)
 	}
 	//初始配置初始化
+	config.ClientConfig.params =
+		sip.NewParams().Add("tag", sip.String{Str: device.RandNumString(9)})
 	config.ClientConfig.GetUaOption()
 	config.ClientConfig.GetServerOption()
 

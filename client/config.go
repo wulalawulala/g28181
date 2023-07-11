@@ -17,6 +17,8 @@ type ClientConfigOption struct {
 
 	crwm *sync.RWMutex //访问GB28181的DeviceInfo需要开锁和解锁
 
+	params sip.Params
+
 	UaRealmAddr *sip.Address //sip:%s@%s sip:31011500991320000343@4401020049 携带tag Params: sip.NewParams().Add("tag", sip.String{Str: utils.RandNumString(9)})
 	UaIpAddr    *sip.Address //sip:%s@%s:%d sip:31011500991320000343@192.168.3.105:5060
 	NewUaIpAddr *sip.Address //sip:%s@%s:%d sip:31011500991320000343@received:rport //返回的via
@@ -41,8 +43,9 @@ func (c *ClientConfigOption) GetUaOption() error {
 		return err
 	}
 	c.UaRealmAddr = &sip.Address{
-		Uri:    uaRealmUrl,
-		Params: sip.NewParams().Add("tag", sip.String{Str: device.RandNumString(9)}),
+		Uri: uaRealmUrl,
+		// Params: sip.NewParams().Add("tag", sip.String{Str: device.RandNumString(9)}),
+		Params: c.params,
 	}
 
 	uaIpUrl, err := parser.ParseUri(fmt.Sprintf("sip:%s@%s:%d", c.GB28181.GBID, c.GB28181.LocalHost, c.GB28181.LocalSipPort))
