@@ -40,6 +40,10 @@ type Devices struct {
 	Longitude string `xml:"Longitude" bson:"longitude" json:"longitude"`
 	Latitude  string `xml:"Latitude" bson:"latitude" json:"latitude"`
 }
+type DeviceList struct {
+	Num  int       `xml:"Num,attr"`
+	Item []Devices `xml:"Item"`
+}
 
 // CatalogResponse 设备明细列表返回结构
 type CatalogResponse struct {
@@ -49,7 +53,8 @@ type CatalogResponse struct {
 	DeviceID string   `xml:"DeviceID"`
 	SumNum   int      `xml:"SumNum"`
 
-	Item []Devices `xml:"DeviceList>Item"`
+	// Item []Devices `xml:"DeviceList>Item"`
+	Devices DeviceList `xml:"DeviceList"`
 }
 
 // DeviceInfoResponse 主设备明细返回结构
@@ -112,8 +117,10 @@ func (g *GB28181Config) CatalogBuild(m MessageReceive, Longitude, Latitude strin
 				Longitude:    Longitude,
 				Latitude:     Latitude,
 			}
-			catalogResponse.Item = append(catalogResponse.Item, item)
+			// catalogResponse.Item = append(catalogResponse.Item, item)
+			catalogResponse.Devices.Item = append(catalogResponse.Devices.Item, item)
 		}
+		catalogResponse.Devices.Num = len(catalogResponse.Devices.Item)
 	}
 
 	bodyByte, err := XMLEncode(catalogResponse)
