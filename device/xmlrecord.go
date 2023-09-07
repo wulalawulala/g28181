@@ -48,3 +48,21 @@ func (m *MessageRecordInfoRsp) BuildString() string {
 	}
 	return string(bodyByte)
 }
+
+type MessageRecordInfoRspV2 struct {
+	CmdType  string       `xml:"CmdType"`
+	SN       int          `xml:"SN"`
+	DeviceID string       `xml:"DeviceID"`
+	SumNum   int          `xml:"SumNum"`
+	Item     []RecordItem `xml:"RecordList>Item"`
+	// Records RecordLists `xml:"RecordList"`
+}
+
+func (m *MessageRecordInfoRspV2) BuildString() string {
+
+	bodyByte, err := XMLEncode(m)
+	if err != nil {
+		return ""
+	}
+	return string(bodyByte)
+}
